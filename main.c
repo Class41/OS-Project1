@@ -62,7 +62,7 @@ int main(int argc, char** argv)
    {
       int forkdata = fork();
 
-      if(forkdata > 0)
+      if(forkdata > 0) //If parent
       {
          printf("\n%s: Parent: Fork Start: %i", argv[0], forkdata);
          forks[itercounter] = forkdata;
@@ -82,22 +82,22 @@ int main(int argc, char** argv)
 
          printf("\n%s: Parent: Fork End: %i\n", argv[0], forkdata);
       }
-      else
+      else //if child
       {
-         int count;
-
-         fscanf(input, "%i", &count); 
-
-         /*FILE* trackread = fopen("tracker", "r");
+         FILE* trackread = fopen("tracker", "r");
 
          if(trackread != NULL)
          {
-            int posval = 0;
-            fscanf("%i", &posval);
+            int posval;
+            fscanf(trackread, "%i", &posval);
             
             if(posval > 0)
                fseek(input, posval, SEEK_SET);
-         }*/
+         }
+
+         int count;
+
+         fscanf(input, "%i", &count); 
 
          struct Stack* stack = StackInit(count);
 
@@ -129,15 +129,13 @@ int main(int argc, char** argv)
          {  
             fprintf(output, "%i ", Pop(stack));
          }
-         
-         FILE* tracker = fopen("tracker", "wr");
-         
-         /*long test = ftell(tracker);
-         printf("VALUE : : %l", test);
 
-         fprintf("%i", ftell(tracker));
+         FILE* tracker = fopen("tracker", "wr");
+
+         fprintf(tracker, "%i", ftell(input));
+         printf("%l", ftell(input));
          fclose(tracker);
-*/
+
          fprintf(output, "\n");
          exit(0);
       }
@@ -149,6 +147,7 @@ int main(int argc, char** argv)
       fprintf(output,"%i ", forks[itercounter]);
    }
 
+   remove("tracker");
    fclose(output);
    return 0;
 }
