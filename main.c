@@ -50,36 +50,56 @@ int main(int argc, char** argv)
        return;
    }
 
-   int iterations;
+   int iterations; //how many sets of data there are
    fscanf(input, "%i", &iterations); 
 
-   printf("\n%s: Info: Performing %i operations", argv[0], iterations);
+   printf("\n%s: Info: Performing %i operations\n", argv[0], iterations);
 
    int itercounter;
+   int* forks = calloc(3, sizeof(int));
    for(itercounter = 0; itercounter < iterations; itercounter++)
    {
-      int count;
-      fscanf(input, "%i", &count); 
+      int forkdata = fork();
+
+      if(forkdata > 0)
+      {
+         printf("\n%s: Parent: Fork Start: %i", argv[0], forkdata);
+         forks[itercounter] = forkdata;
+         wait();
+         printf("\n%s: Parent: Fork End: %i\n", argv[0], forkdata);
+      }
+      else
+      {
+         int count;
+         fscanf(input, "%i", &count); 
       
-      struct Stack* stack = StackInit(count);
+         struct Stack* stack = StackInit(count);
 
-      int tmp;
-      int i;
-      for(i = 0; i < count; i++)
-      {
-         fscanf(input, "%i", &tmp);
-         Push(stack, tmp);
+         int tmp;
+         int i;
+         for(i = 0; i < count; i++)
+         {
+            fscanf(input, "%i", &tmp);
+            Push(stack, tmp);
+         }
+
+         fprintf(output, "%i: ", getpid());
+         for(i = 0; i < count; i++)
+         {  
+            fprintf(output, "%i ", Pop(stack));
+         }  
+
+         fprintf(output, "\n");
+         exit(0);
       }
-
-      fprintf(output, "%i: ", 99999);
-      for(i = 0; i < count; i++)
-      {
-         fprintf(output, "%i ", Pop(stack));
-      }
-
-      fprintf(output, "\n");
    }
    
+   fprintf(output, "All children were: ");
+   for(itercounter = 0; itercounter < iterations; itercounter++)
+   {
+      fprintf(output,"%i ", forks[itercounter]);
+   }
+
    fclose(output);
    return 0;
 }
