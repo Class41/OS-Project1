@@ -88,6 +88,17 @@ int main(int argc, char** argv)
 
          fscanf(input, "%i", &count); 
 
+         /*FILE* trackread = fopen("tracker", "r");
+
+         if(trackread != NULL)
+         {
+            int posval = 0;
+            fscanf("%i", &posval);
+            
+            if(posval > 0)
+               fseek(input, posval, SEEK_SET);
+         }*/
+
          struct Stack* stack = StackInit(count);
 
          int i;
@@ -117,8 +128,16 @@ int main(int argc, char** argv)
          for(i = 0; i < count; i++)
          {  
             fprintf(output, "%i ", Pop(stack));
-         }  
+         }
+         
+         FILE* tracker = fopen("tracker", "wr");
+         
+         /*long test = ftell(tracker);
+         printf("VALUE : : %l", test);
 
+         fprintf("%i", ftell(tracker));
+         fclose(tracker);
+*/
          fprintf(output, "\n");
          exit(0);
       }
