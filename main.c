@@ -7,147 +7,150 @@
 
 int main(int argc, char** argv)
 {
-   int item;
+	int optionItem;
 
-   char* inputname  = malloc(50 * sizeof(char) + 1);
-   char* outputname = malloc(50 * sizeof(char) + 1); 
+	char* inputName = malloc(50 * sizeof(char) + 1);
+	char* outputName = malloc(50 * sizeof(char) + 1);
 
-   strcpy(inputname, "input.dat");
-   strcpy(outputname, "output.dat");
-   while((item = getopt(argc, argv, "hi:o:")) != -1)
-   {
-      switch(item)
-      {
-         case 'h':
-            printf("\t%s Help Menu\n\
+	strcpy(inputName, "input.dat");
+	strcpy(outputName, "output.dat");
+	while ((optionItem = getopt(argc, argv, "hi:o:")) != -1)
+	{
+		switch (optionItem)
+		{
+		case 'h':
+			printf("\t%s Help Menu\n\
             \t-h : show help dialog \n\
             \t-i [filename] : input filename. default: input.dat\n\
             \t-o [filename] : output filename. default: output.dat\n", argv[0]);
-            return;
-         case 'i':
-            strcpy(inputname, optarg);
-            printf("\n%s: Info: set input file to: %s", argv[0], optarg);
-            break;
-         case 'o':
-            strcpy(outputname, optarg);
-            printf("\n%s: Info: set output file to: %s", argv[0], optarg);
-            break;
-         case '?':
-            printf("\n%s: Error: Invalid Argument or Arguments missing. Use -h to see usage.", argv[0]);
-            return;
-      }
-   }
+			return;
+		case 'i':
+			strcpy(inputName, optarg);
+			printf("\n%s: Info: set input file to: %s", argv[0], optarg);
+			break;
+		case 'o':
+			strcpy(outputName, optarg);
+			printf("\n%s: Info: set output file to: %s", argv[0], optarg);
+			break;
+		case '?':
+			printf("\n%s: Error: Invalid Argument or Arguments missing. Use -h to see usage.", argv[0]);
+			return;
+		}
+	}
 
-   printf("\n%s: Info: input file: %s, output file: %s", argv[0] ,inputname, outputname);
+	printf("\n%s: Info: input file: %s, output file: %s", argv[0], inputName, outputName);
 
-   FILE* input = fopen(inputname, "r");
-   FILE* output = fopen(outputname, "wr");
+	FILE* input = fopen(inputName, "r");
+	FILE* output = fopen(outputName, "wr");
 
-   if(input == NULL)
-   {
-       printf("\n%s: ", argv[0]);
-       fflush(stdout);
-       perror("Error: Failed to open input file");
-       return;
-   }
+	if (input == NULL)
+	{
+		printf("\n%s: ", argv[0]);
+		fflush(stdout);
+		perror("Error: Failed to open input file");
+		return;
+	}
 
-   int iterations; //how many sets of data there are
-   fscanf(input, "%i", &iterations);
+	int iterations; //how many sets of data there are
+	fscanf(input, "%i", &iterations);
 
-   printf("\n%s: Info: Performing %i operations\n", argv[0], iterations);
+	printf("\n%s: Info: Performing %i operations\n", argv[0], iterations);
 
-   int itercounter;
-   int* forks = calloc(3, sizeof(int));
-   for(itercounter = 0; itercounter < iterations; itercounter++)
-   {
-      int forkdata = fork();
+	int itercounter;
+	int* forks = calloc(3, sizeof(int));
+	for (itercounter = 0; itercounter < iterations; itercounter++)
+	{
+		int forkdata = fork();
 
-      if(forkdata > 0) //If parent
-      {
-         printf("\n%s: Parent: Fork Start: %i", argv[0], forkdata);
-         forks[itercounter] = forkdata;
-         
-         int exitstatus;
+		if (forkdata > 0) //If parent
+		{
+			printf("\n%s: Parent: Fork Start: %i", argv[0], forkdata);
+			forks[itercounter] = forkdata;
 
-         waitpid(forkdata, &exitstatus, 0);
+			int exitstatus;
 
-         if( WIFEXITED(exitstatus) )
-         {
-            if (WEXITSTATUS(exitstatus) == 42)
-            {
-               printf("\n%s: Parent: Error: Abort on iter# %i\n", argv[0], itercounter);
-               return;
-            }
-         }
+			waitpid(forkdata, &exitstatus, 0);
 
-         printf("\n%s: Parent: Fork End: %i\n", argv[0], forkdata);
-      }
-      else //if child
-      {
-         FILE* trackread = fopen("tracker", "r");
+			if (WIFEXITED(exitstatus))
+			{
+				if (WEXITSTATUS(exitstatus) == 42)
+				{
+					printf("\n%s: Parent: Error: Abort on iter# %i\n", argv[0], itercounter);
+					return;
+				}
+			}
 
-         if(trackread != NULL)
-         {
-            int posval;
-            fscanf(trackread, "%i", &posval);
-            
-            if(posval > 0)
-               fseek(input, posval, SEEK_SET);
-         }
+			printf("\n%s: Parent: Fork End: %i\n", argv[0], forkdata);
+		}
+		else //if child
+		{
+			FILE* trackread = fopen(".filetrack", "r");
 
-         int count;
+			if (trackread != NULL)
+			{
+				int posval;
+				fscanf(trackread, "%i", &posval);
 
-         fscanf(input, "%i", &count); 
+				if (posval > 0)
+					fseek(input, posval, SEEK_SET);
+			}
 
-         struct Stack* stack = StackInit(count);
+			int count;
 
-         int i;
-         int tmp;
-         char line[1000];
+			fscanf(input, "%i", &count);
 
-         fgetc(input);
-         fgets(line, 1000, input);
+			struct Stack* stack = StackInit(count);
 
-         char* value = strtok(line, " ");
-         
-         while(value != NULL)
-         {
-            if(!IsFull(stack))
-            {
-               Push(stack, atoi(value));
-            }
-            else
-            {
-               printf("\n%s: Error: Input Line Data and Count Mismatch.\n", argv[0]);
-               exit(42);
-            }
-            value = strtok(NULL, " ");
-         }
+			int i;
+			int tmp;
+			char line[1000];
 
-         fprintf(output, "%i: ", getpid());
-         for(i = 0; i < count; i++)
-         {  
-            fprintf(output, "%i ", Pop(stack));
-         }
+			fgetc(input);
+			fgets(line, 1000, input);
 
-         FILE* tracker = fopen("tracker", "wr");
+			char* value = strtok(line, " ");
 
-         fprintf(tracker, "%i", ftell(input));
-         printf("%l", ftell(input));
-         fclose(tracker);
+			while (value != NULL)
+			{
+				if (!IsFull(stack))
+				{
+					Push(stack, atoi(value));
+				}
+				else
+				{
+					printf("\n%s: Error: Input Line Data and Count Mismatch.\n", argv[0]);
+					exit(42);
+				}
+				value = strtok(NULL, " ");
+			}
 
-         fprintf(output, "\n");
-         exit(0);
-      }
-   }
-   
-   fprintf(output, "All children were: ");
-   for(itercounter = 0; itercounter < iterations; itercounter++)
-   {
-      fprintf(output,"%i ", forks[itercounter]);
-   }
+			fprintf(output, "%i: ", getpid());
+			for (i = 0; i < count; i++)
+			{
+				fprintf(output, "%i ", Pop(stack));
+			}
 
-   remove("tracker");
-   fclose(output);
-   return 0;
+			FILE* filetrack = fopen(".filetrack", "wr");
+
+			fprintf(filetrack, "%i", ftell(input));
+			printf("%l", ftell(input));
+			fclose(filetrack);
+
+			fprintf(output, "\n");
+			exit(0);
+		}
+	}
+
+	fprintf(output, "All children were: ");
+	for (itercounter = 0; itercounter < iterations; itercounter++)
+	{
+		fprintf(output, "%i ", forks[itercounter]);
+	}
+
+	remove(".filetrack");
+	fclose(output);
+   free(forks);
+   free(inputName);
+   free(outputName);
+	return 0;
 }

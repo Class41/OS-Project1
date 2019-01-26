@@ -1,9 +1,9 @@
 #include <stdlib.h>
 
 struct Stack {
-   int head;
-   int capacity;
-   int* data;
+	int head;
+	int capacity;
+	int* data;
 };
 
 struct Stack* StackInit(int);
