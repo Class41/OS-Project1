@@ -31,7 +31,7 @@ int Pop(struct Stack* stack)
 
 int IsFull(struct Stack* stack)
 {
-   if(stack->head >= stack->capacity)
+   if(stack->head >= stack->capacity - 1)
       return 1;
    else
       return 0;

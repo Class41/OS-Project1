@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/wait.h>
 #include "stack.h"
 
 int main(int argc, char** argv)
@@ -32,7 +33,7 @@ int main(int argc, char** argv)
             printf("\n%s: Info: set output file to: %s", argv[0], optarg);
             break;
          case '?':
-            printf("\n%s: Error: Invalid Argument or Arguments missing. Use -h \to see usage.", argv[0]);
+            printf("\n%s: Error: Invalid Argument or Arguments missing. Use -h to see usage.", argv[0]);
             return;
       }
    }
@@ -65,7 +66,20 @@ int main(int argc, char** argv)
       {
          printf("\n%s: Parent: Fork Start: %i", argv[0], forkdata);
          forks[itercounter] = forkdata;
-         wait();
+         
+         int exitstatus;
+
+         waitpid(forkdata, &exitstatus, 0);
+
+         if( WIFEXITED(exitstatus) )
+         {
+            if (WEXITSTATUS(exitstatus) == 42)
+            {
+               printf("\n%s: Parent: Error: Abort on iter# %i\n", argv[0], itercounter);
+               return;
+            }
+         }
+
          printf("\n%s: Parent: Fork End: %i\n", argv[0], forkdata);
       }
       else
@@ -78,12 +92,25 @@ int main(int argc, char** argv)
 
          int i;
          int tmp;
-      
-         for(i = 0; i < count; i++)
+         char line[1000];
+
+         fgetc(input);
+         fgets(line, 1000, input);
+
+         char* value = strtok(line, " ");
+         
+         while(value != NULL)
          {
-            
-            fscanf(input, "%i", &tmp);
-            Push(stack, tmp);
+            if(!IsFull(stack))
+            {
+               Push(stack, atoi(value));
+            }
+            else
+            {
+               printf("\n%s: Error: Input Line Data and Count Mismatch.\n", argv[0]);
+               exit(42);
+            }
+            value = strtok(NULL, " ");
          }
 
          fprintf(output, "%i: ", getpid());
