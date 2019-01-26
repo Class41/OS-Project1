@@ -32,7 +32,7 @@ int main(int argc, char** argv)
             printf("\n%s: Info: set output file to: %s", argv[0], optarg);
             break;
          case '?':
-            printf("\n%s: Error: Arguments missing. Use -h to see usage.", argv[0]);
+            printf("\n%s: Error: Invalid Argument or Arguments missing. Use -h \to see usage.", argv[0]);
             return;
       }
    }
@@ -51,7 +51,7 @@ int main(int argc, char** argv)
    }
 
    int iterations; //how many sets of data there are
-   fscanf(input, "%i", &iterations); 
+   fscanf(input, "%i", &iterations);
 
    printf("\n%s: Info: Performing %i operations\n", argv[0], iterations);
 
@@ -71,14 +71,17 @@ int main(int argc, char** argv)
       else
       {
          int count;
+
          fscanf(input, "%i", &count); 
-      
+
          struct Stack* stack = StackInit(count);
 
-         int tmp;
          int i;
+         int tmp;
+      
          for(i = 0; i < count; i++)
          {
+            
             fscanf(input, "%i", &tmp);
             Push(stack, tmp);
          }
