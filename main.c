@@ -149,6 +149,7 @@ int main(int argc, char** argv)
 
 	remove(".filetrack");
 	fclose(output);
+   fclose(input);
    free(forks);
    free(inputName);
    free(outputName);
