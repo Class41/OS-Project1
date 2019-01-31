@@ -11,3 +11,4 @@ void Push(struct Stack*, int);
 int Pop(struct Stack*);
 int IsFull(struct Stack*);
 int IsEmpty(struct Stack*);
+int HasExpectedCount(struct Stack*, int);

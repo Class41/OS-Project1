@@ -44,3 +44,15 @@ int IsEmpty(struct Stack* stack)
 	else
 		return 0;
 }
+
+int HasExpectedCount(struct Stack* stack, int expectedCount)
+{
+   if(stack->head + 1 == expectedCount)
+   {
+      return 1;
+   }
+   else
+   {
+      return 0;
+   }
+}
