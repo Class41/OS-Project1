@@ -146,6 +146,7 @@ int main(int argc, char** argv)
 	{
 		fprintf(output, "%i ", forks[itercounter]);
 	}
+   fprintf(output, "\nSelf: %i", getpid());
 
 	remove(".filetrack");
 	fclose(output);
