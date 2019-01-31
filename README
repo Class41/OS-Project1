@@ -1,0 +1,27 @@
+Compilation:
+
+To compile, simply type "make" while in the root directory of this project.
+
+Alternatively, you may manually compile:
+
+stack.c + stack.h -> stack.o
+main.c -> main.o
+
+then link the files into the executable.
+
+Assumptions:
+
+Filename is less than 50 characters
+Items in the input file are space-separated
+No line in input file exceeds 1000 characters
+
+Usage:
+
+To see usage data, execute the file with the flag -h:
+
+./Parser -h
+
+Defaults:
+
+Default files are input.dat and output.dat. 
+
